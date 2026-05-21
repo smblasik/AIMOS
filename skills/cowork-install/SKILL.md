@@ -137,30 +137,158 @@ When I ask you to do something, check the index first to see if there's a skill 
 
 ---
 
-## Step 5 — Write AIMOS/index.md
+## Step 5 — Define folder structure in AIMOS/index.md
 
-Write the following to `{target}/AIMOS/index.md`:
+This step determines the `## Structure` section of `{target}/AIMOS/index.md`. It is the most important part of the install because Claude uses this map to navigate the project directory and know where to read from and write to.
+
+### 5a — Ask the user which option they want
+
+Use `AskUserQuestion` with a single question:
+
+> "How should Claude understand your folder structure?"
+
+Options:
+- **Use a framework template** — Choose from PARA, ACE, or the Corder system
+- **Read my existing folders** — Scan my selected directory and build the map from what's already there
+- **Skip for now** — Leave the structure blank; I'll fill it in later
+
+---
+
+### 5b — Option 1: Framework template
+
+If the user selects **Use a framework template**, ask a follow-up question:
+
+> "Which framework would you like to use?"
+
+Options: `PARA`, `ACE`, `Corder System`
+
+Then write `{target}/AIMOS/index.md` using the matching template below.
+
+---
+
+#### PARA
 
 ```markdown
 # Vault Map
 
 ## Structure
 
-
 Root/
-├── +/                        # inbox — default drop location for all new files
-├── 1 Projects/               # active project notes
-├── 2 Areas/                  # ongoing responsibilities
-├── 3 Resources/              # reference material and templates
-│   └── Templates/
-├── 4 Notes/
-│   ├── Meeting Notes/        # dated meeting notes
-│   ├── Weekly Updates/       # YYYY-MM-DD Weekly Update.md
-│   ├── Topic Notes/          # evergreen reference notes
-│   └── Daily Notes/
-├── 5 Archive/                # completed content; ignore by default
+├── 1 Projects/               # active, time-bound work with a clear outcome
+├── 2 Areas/                  # ongoing responsibilities (no end date)
+├── 3 Resources/              # reference material, templates, topic notes
+├── 4 Archive/                # completed or inactive content; ignore by default
 └── AIMOS/                    # AI OS config — do not modify unless asked
 
+## Notes
+- **Projects** have a deadline or completion state. One folder per project.
+- **Areas** represent standards to maintain (e.g., Health, Finance, Career).
+- **Resources** are evergreen — reference material you return to over time.
+- **Archive** is a cold-storage dump. Claude ignores it unless explicitly asked.
+```
+
+---
+
+#### ACE
+
+```markdown
+# Vault Map
+
+## Structure
+
+Root/
+├── Atlas/                    # knowledge — notes, references, maps of content
+│   ├── Notes/
+│   ├── Concepts/
+│   └── People/
+├── Calendar/                 # time-based — meetings, dailies, weeklies
+│   ├── Daily Notes/
+│   ├── Weekly Reviews/
+│   └── Meetings/
+├── Efforts/                  # active work — projects and ongoing responsibilities
+│   ├── Projects/
+│   └── Areas/
+└── AIMOS/                    # AI OS config — do not modify unless asked
+
+## Notes
+- **Atlas** is timeless knowledge. Things you learn and want to keep.
+- **Calendar** is time-indexed. Anything with a date goes here.
+- **Efforts** is where work lives. Active projects and standing responsibilities.
+```
+
+---
+
+#### Corder System
+
+```markdown
+# Vault Map
+
+## Structure
+
+Root/
+├── 00-Inbox/                 # drop zone for unprocessed notes and quick captures
+├── 01-Projects/
+│   └── ACTIVE/
+│       └── [CLIENT]-[PROJECT]-[YYYY]/   # one folder per engagement; contains Project Hub note
+├── 02-Stakeholders/          # one note per key stakeholder; Claude reads these to calibrate comms
+├── 03-Action-Items/          # all action items as individual notes, queryable across projects
+├── 04-Meetings/              # all meeting notes; project-code YAML field links to parent project
+├── 05-Status-Reports/        # weekly status reports and sprint artifacts
+├── 06-Templates/             # ready-to-use note templates
+├── 07-Reference/
+│   ├── Claude-Context/       # context files loaded into every Claude session
+│   ├── SessionStarter.md     # copy-paste prompts to start Claude sessions
+│   ├── Obsidian-Daily-Workflow-Guide.md
+│   └── Obsidian-PM-Setup-Guide.md
+├── 08-Daily-Notes/           # daily notes, auto-created each morning
+└── AIMOS/                    # AI OS config — do not modify unless asked
+
+## Notes
+- New files default to `00-Inbox/` unless a specific folder is given.
+- Project folders follow the pattern `[CLIENT]-[PROJECT]-[YYYY]` for consistent sorting.
+- `02-Stakeholders/` is read by Claude when drafting communications to calibrate tone and context.
+- `07-Reference/Claude-Context/` is where additional Claude context files live beyond AIMOS.
+```
+
+---
+
+### 5c — Option 2: Read existing folder structure
+
+If the user selects **Read my existing folders**:
+
+1. Use `Bash` to list the top two levels of the selected workspace directory, excluding hidden folders and the `AIMOS/` folder itself:
+   ```bash
+   find {target} -maxdepth 2 -not -path '*/.git*' -not -path '*/AIMOS*' -not -name '.*' | sort
+   ```
+2. Parse the output into a tree representation.
+3. Write `{target}/AIMOS/index.md` using this structure:
+
+```markdown
+# Vault Map
+
+## Structure
+
+[Insert tree here, formatted as a code block with # comments describing each top-level folder]
+
+## Notes
+- This structure was scanned from your existing directory on install.
+- Update this file any time your folder structure changes so Claude stays accurate.
+```
+
+4. After writing, tell the user: "I mapped your existing folder structure into `AIMOS/index.md`. Review it and add any notes or corrections — Claude will use this to navigate your files."
+
+---
+
+### 5d — Option 3: Skip
+
+If the user selects **Skip for now**, write a minimal placeholder to `{target}/AIMOS/index.md`:
+
+```markdown
+# Vault Map
+
+## Structure
+
+<!-- Add your folder structure here. Claude uses this to navigate your files. -->
 
 ## Skills
 
@@ -172,6 +300,30 @@ Located in `AIMOS/skills/` — each is a subfolder with a `SKILL.md`:
 | `feedback` | Draft structured feedback using the SBI framework |
 | `meeting-notes` | Meeting note structure and formatting |
 | `skill-creator` | Create new skills in the correct format |
+| `weekly-update` | Synthesize notes, emails, and calendar into a weekly status update |
+| `writing-style` | Tone, structure, and voice guidance |
+```
+
+Tell the user: "The index structure section is blank. When you're ready, open `AIMOS/index.md` and describe your folder layout — or ask me to scan your directory and build it automatically."
+
+---
+
+### 5e — Append Skills table (all options)
+
+After writing the Structure section (regardless of which option was chosen), append the following Skills table to `{target}/AIMOS/index.md` — unless it was already included in the template (Option 3 includes it by default):
+
+```markdown
+## Skills
+
+Located in `AIMOS/skills/` — each is a subfolder with a `SKILL.md`:
+
+| Skill | Description |
+|---|---|
+| `cowork-install` | Install AIMOS into a folder via Claude Cowork |
+| `feedback` | Draft structured feedback using the SBI framework |
+| `meeting-notes` | Meeting note structure and formatting |
+| `skill-creator` | Create new skills in the correct format |
+| `weekly-update` | Synthesize notes, emails, and calendar into a weekly status update |
 | `writing-style` | Tone, structure, and voice guidance |
 ```
 
