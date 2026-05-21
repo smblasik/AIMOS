@@ -38,6 +38,7 @@ The install creates:
 ```
 {target}/
 ├── CLAUDE.md
+├── [framework folders]/      # created based on chosen framework (PARA, ACE, or Corder)
 └── AIMOS/
     ├── agent.md
     ├── index.md
@@ -249,6 +250,53 @@ Root/
 - `02-Stakeholders/` is read by Claude when drafting communications to calibrate tone and context.
 - `07-Reference/Claude-Context/` is where additional Claude context files live beyond AIMOS.
 ```
+
+---
+
+### 5f — Create framework directories (Option 1 only)
+
+After writing `AIMOS/index.md`, use `Bash` to create the actual folders for the selected framework. Run the appropriate `mkdir -p` command below, substituting `{target}` with the install path.
+
+#### PARA
+
+```bash
+mkdir -p \
+  "{target}/1 Projects" \
+  "{target}/2 Areas" \
+  "{target}/3 Resources" \
+  "{target}/4 Archive"
+```
+
+#### ACE
+
+```bash
+mkdir -p \
+  "{target}/Atlas/Notes" \
+  "{target}/Atlas/Concepts" \
+  "{target}/Atlas/People" \
+  "{target}/Calendar/Daily Notes" \
+  "{target}/Calendar/Weekly Reviews" \
+  "{target}/Calendar/Meetings" \
+  "{target}/Efforts/Projects" \
+  "{target}/Efforts/Areas"
+```
+
+#### Corder System
+
+```bash
+mkdir -p \
+  "{target}/00-Inbox" \
+  "{target}/01-Projects/ACTIVE" \
+  "{target}/02-Stakeholders" \
+  "{target}/03-Action-Items" \
+  "{target}/04-Meetings" \
+  "{target}/05-Status-Reports" \
+  "{target}/06-Templates" \
+  "{target}/07-Reference/Claude-Context" \
+  "{target}/08-Daily-Notes"
+```
+
+Run only the block that matches the user's chosen framework. Do not create directories for other frameworks.
 
 ---
 
