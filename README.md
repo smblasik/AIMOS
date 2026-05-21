@@ -1,6 +1,6 @@
 # AIMOS — AI Operating System
 
-A personalized Claude setup you can drop into any folder or Obsidian vault. Answer a few questions and it configures itself around your name, working style, and folder structure.
+A personalized Agentic AI setup you can drop into any folder or Obsidian vault. Answer a few questions and it configures itself around your name, working style, and folder structure.
 
 ---
 
