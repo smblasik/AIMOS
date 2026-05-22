@@ -437,11 +437,99 @@ Fetch each file from the URLs below and write to the corresponding path under `{
 
 ---
 
-## Step 9 — Confirm completion
+## Step 9 — Confirm completion and optionally enrich operations
+
+### 9a — Optional: SOW or client summary
+
+Use `AskUserQuestion` with a single question:
+
+> "Do you want to paste in an SOW, project brief, or client summary? I'll use it to pre-populate your operations context."
+
+Options:
+- **Yes — paste it in** — Provide the document text and I'll extract key details
+- **No — I'll fill it in later** — Skip and move on
+
+---
+
+#### If the user selects Yes
+
+Ask them to paste the content directly into the chat.
+
+Once received, extract the following fields (use best judgment where fields are ambiguous or implied):
+
+| Field | What to look for |
+|---|---|
+| Client / Organization | Client name, company, or agency |
+| Project / Engagement name | Project title or engagement name |
+| Engagement type | Implementation, assessment, strategy, transformation, etc. |
+| Scope summary | Key deliverables, workstreams, or phases (1–2 sentences) |
+| Timeline | Start date, end date, or phase milestones |
+| Key stakeholders | Named contacts, sponsors, or decision-makers |
+| Environment | Industry, regulatory context, or technical environment |
+| Goal | Primary objective or business outcome |
+
+Then **overwrite** `{target}/AIMOS/operations.md` with the enriched version:
+
+```markdown
+# Operations
+
+Claude references this file whenever you discuss project work. Update it as context evolves.
+
+## Identity and Strategic Context
+
+- **Client:** {client}
+- **Project:** {project}
+- **Engagement Type:** {engagement_type}
+- **Name:** {name}
+- **Role:** {role}
+- **Organization:** {org}
+- **Environment:** {environment}
+- **Goal:** {goal}
+
+## Current Projects
+
+| Project | Status | Notes |
+|---------|--------|-------|
+| {project} | Active | {scope_summary} |
+
+## Key Stakeholders
+
+| Name | Role | Notes |
+|------|------|-------|
+{stakeholder_rows}
+
+## Timeline
+
+{timeline}
+
+## Behavioral Defaults
+
+- **Lead with Output:** Deliver the artifact first. Provide commentary afterward.
+- **Format:** Structured Markdown. Use headers, short paragraphs, and tables.
+- **Tone:** Adapt to context — formal for stakeholders, direct for working sessions.
+- **Ambiguity:** State assumptions and proceed. Only halt for material gaps.
+```
+
+**Fill-in rules:**
+- `{stakeholder_rows}` — one `| Name | Role | Notes |` row per identified stakeholder; if none found, write `| — | — | — |`
+- `{timeline}` — bullet list of milestones or date ranges if found; otherwise write `—`
+- Any field that cannot be extracted: leave blank or write `—`
+- Carry over `{name}`, `{role}`, `{org}` from Step 1 answers
+
+Tell the user: "I've populated `operations.md` with context from your document. Review and update it as the engagement evolves."
+
+---
+
+#### If the user selects No
+
+Proceed to 9b.
+
+---
+
+### 9b — Confirm install
 
 Tell the user:
 - Where AIMOS was installed (folder path)
 - What was created (brief file list)
-- Next step: open `AIMOS/operations.md` and fill in current projects and stakeholders
 
 Do not link to internal file paths or expose system directories. Use plain folder names only.
