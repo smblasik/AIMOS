@@ -128,13 +128,13 @@ When I ask you to do something, check the index first to see if there's a skill 
 
 **Placeholder substitution rules:**
 
-| Placeholder | Value |
-|---|---|
-| `{name}` | User's first name |
-| `{response_length_rule}` | Short → `Keep responses short unless I ask for more, or the task truly requires it` / Detailed → `Default to thorough, detailed responses unless I ask you to be brief` |
-| `{pushback_rule}` | Push back → `Give honest pushback when you disagree — push back when something seems off` / Follow lead → `Follow my direction; flag concerns briefly, then proceed` |
-| `{tone_lines}` | Casual → `- Clear, concise, and direct` + newline + `- Confident without being stiff` + newline + `- Conversational but purposeful` / Formal → `- Clear, concise, and respectful` + newline + `- Calm, confident, and accountability-driven` + newline + `- Direct without sounding abrupt or confrontational` |
-| `{sign_off}` | User's chosen sign-off, default `Best,` |
+| Placeholder              | Value                                                                                                                                                                                                                                                                                                          |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `{name}`                 | User's first name                                                                                                                                                                                                                                                                                              |
+| `{response_length_rule}` | Short → `Keep responses short unless I ask for more, or the task truly requires it` / Detailed → `Default to thorough, detailed responses unless I ask you to be brief`                                                                                                                                        |
+| `{pushback_rule}`        | Push back → `Give honest pushback when you disagree — push back when something seems off` / Follow lead → `Follow my direction; flag concerns briefly, then proceed`                                                                                                                                           |
+| `{tone_lines}`           | Casual → `- Clear, concise, and direct` + newline + `- Confident without being stiff` + newline + `- Conversational but purposeful` / Formal → `- Clear, concise, and respectful` + newline + `- Calm, confident, and accountability-driven` + newline + `- Direct without sounding abrupt or confrontational` |
+| `{sign_off}`             | User's chosen sign-off, default `Best,`                                                                                                                                                                                                                                                                        |
 
 ---
 
