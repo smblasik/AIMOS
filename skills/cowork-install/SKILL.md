@@ -348,7 +348,6 @@ Located in `AIMOS/skills/` — each is a subfolder with a `SKILL.md`:
 | `feedback` | Draft structured feedback using the SBI framework |
 | `meeting-notes` | Meeting note structure and formatting |
 | `skill-creator` | Create new skills in the correct format |
-| `weekly-update` | Synthesize notes, emails, and calendar into a weekly status update |
 | `writing-style` | Tone, structure, and voice guidance |
 ```
 
