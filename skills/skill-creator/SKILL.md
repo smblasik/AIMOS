@@ -6,7 +6,7 @@ tags:
 description: Helps create new skills in the correct format with proper YAML frontmatter and directory structure.
 ---
 
-Guide the creation of a new skill in the AIOS/Skills folder.
+Guide the creation of a new skill.
 
 ## Step 1: Gather skill requirements
 
@@ -19,12 +19,12 @@ Ask the user for:
 
 Create the skill folder at:
 ```
-AIOS/Skills/<skill-name>/SKILL.md
+AIMOS/skills/<skill-name>/SKILL.md
 ```
 
 Use bash to create the directory:
 ```bash
-mkdir -p "AIOS/Skills/<skill-name>"
+mkdir -p "AIMOS/skills/<skill-name>"
 ```
 
 ## Step 3: Generate the SKILL.md file
@@ -49,9 +49,9 @@ Help the user write clear skill instructions:
 
 - Use numbered steps for sequential processes
 - Use bullet points for lists of rules or options
-- Include code blocks (```markdown or ```yaml) for examples
+- Include code blocks (`markdown or yaml`) for examples
 - Keep instructions concise and actionable
-- Reference specific folders using the vault path format (e.g., `04 Notes/Meeting Notes`)
+- Reference specific folders using the vault path format (e.g., `4 Notes/Meeting Notes`)
 - Mention any output file locations with exact paths
 - Include any relevant rules or constraints
 
@@ -65,7 +65,7 @@ Before finalizing:
 
 ## Step 6: Write to the index file
 
-After content is finalized, update the `AIOS/index.md` file with the new skill. 
+After content is finalized, update the `AIMOS/index.md` file with the new skill. 
 
 ## Example structure
 

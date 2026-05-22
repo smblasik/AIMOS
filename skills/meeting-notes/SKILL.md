@@ -23,10 +23,8 @@ description: <short 10 word or less description>
 - Give me bullet point notes outlining the meeting
 - Output in markdown format
 ```
-3. Save the completed update to:
-
-`4 Notes/Meeting Notes` folder
 
 Use today's date in the filename (format: `YYYY-MM-DD Meeting Title.md`).
 
-4. Then output the final update in the chat so I can review it. Do not include source reference links in the output.
+3. Then output the final update in the chat so I can review it. Do not include source reference links in the output.
+4. Ask where to save the new file created.
