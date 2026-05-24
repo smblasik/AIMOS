@@ -1,10 +1,11 @@
 ---
 name: writing-style
+description: clear purpose, respectful tone, first-person ownership, operationally precise, no filler, and a polite close.
 tags:
   - AI
   - skill
-description: clear purpose, respectful tone, first-person ownership, operationally precise, no filler, and a polite close.
 ---
+
 Tone:
 - Clear, concise, and respectful
 - Calm, confident, and accountability-driven

@@ -1,9 +1,9 @@
 ---
 name: skill-creator
+description: Helps create new skills in the correct format with proper YAML frontmatter and directory structure.
 tags:
   - AI
   - skill
-description: Helps create new skills in the correct format with proper YAML frontmatter and directory structure.
 ---
 
 Guide the creation of a new skill.
@@ -65,7 +65,7 @@ Before finalizing:
 
 ## Step 6: Write to the index file
 
-After content is finalized, update the `AIMOS/index.md` file with the new skill. 
+After content is finalized, update the `AIMOS/index.md` file with the new skill.
 
 ## Example structure
 

@@ -428,11 +428,11 @@ Fetch each file from the URLs below and write to the corresponding path under `{
 
 | Target path | Source URL |
 |---|---|
-| `AIMOS/skills/feedback/SKILL.md` | https://raw.githubusercontent.com/smblasik/AIMOS/main/skills/feedback/SKILL.md |
-| `AIMOS/skills/meeting-notes/SKILL.md` | https://raw.githubusercontent.com/smblasik/AIMOS/main/skills/meeting-notes/SKILL.md |
-| `AIMOS/skills/skill-creator/SKILL.md` | https://raw.githubusercontent.com/smblasik/AIMOS/main/skills/skill-creator/SKILL.md |
-| `AIMOS/skills/writing-style/SKILL.md` | https://raw.githubusercontent.com/smblasik/AIMOS/main/skills/writing-style/SKILL.md |
-| `AIMOS/skills/cowork-install/SKILL.md` | https://raw.githubusercontent.com/smblasik/AIMOS/main/skills/cowork-install/SKILL.md |
+| `AIMOS/skills/feedback/SKILL.md` | https://raw.githubusercontent.com/smblasik/AIMOS/main/feedback.md |
+| `AIMOS/skills/meeting-notes/SKILL.md` | https://raw.githubusercontent.com/smblasik/AIMOS/main/meeting-notes.md |
+| `AIMOS/skills/skill-creator/SKILL.md` | https://raw.githubusercontent.com/smblasik/AIMOS/main/skill-creator.md |
+| `AIMOS/skills/writing-style/SKILL.md` | https://raw.githubusercontent.com/smblasik/AIMOS/main/writing-style.md |
+| `AIMOS/skills/cowork-install/SKILL.md` | https://raw.githubusercontent.com/smblasik/AIMOS/main/install.md |
 
 ---
 

@@ -1,10 +1,11 @@
 ---
 name: meeting-notes
+description: Outlines how meeting notes should be structured.
 tags:
   - AI
   - skill
-description: Outlines how meeting notes should be structured
 ---
+
 1. Process the input given
 2. Format into the following
 ```markdown

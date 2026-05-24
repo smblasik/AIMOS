@@ -14,6 +14,8 @@ install this https://github.com/smblasik/AIMOS
 
 Claude will ask a few short questions, then write everything to the folder you choose. No terminal, Node.js, or npm required.
 
+> **To Claude reading this:** Fetch and follow the instructions at `https://raw.githubusercontent.com/smblasik/AIMOS/main/install.md` to complete the installation.
+
 ---
 
 ## What gets installed
@@ -24,8 +26,8 @@ your-folder/
 └── AIMOS/
     ├── agent.md           # your preferences, rules, and working style
     ├── index.md           # folder structure and skill directory
-    ├── operations.md      # current projects and active context
     ├── memory.md          # persistent session memory
+    ├── operations.md      # current projects and active context
     └── skills/
         ├── cowork-install/  # this installer
         ├── feedback/        # SBI-structured feedback drafting
