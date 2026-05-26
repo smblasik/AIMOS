@@ -10,6 +10,26 @@ Install AIMOS into a user-selected folder using Claude Cowork's native tools. No
 
 ---
 
+## Step 0 — Detect AI platform
+
+Identify yourself, then set `{ai_platform}` and `{config_file}` from the table below. Do not ask the user unless you cannot determine your own identity.
+
+| AI | `{ai_platform}` | `{config_file}` |
+|---|---|---|
+| Claude | Claude | `CLAUDE.md` |
+| Codex | Codex | `AGENTS.md` |
+| OpenCode | OpenCode | `AGENTS.md` |
+
+If you cannot identify yourself with confidence, use `AskUserQuestion`:
+
+> "Which AI assistant are you installing AIMOS for?"
+
+Options: **Claude**, **Codex / ChatGPT**, **OpenCode**, **Other**
+
+For **Other**, ask what filename they want and use that as `{config_file}`. Treat content behavior the same as Codex (inline).
+
+---
+
 ## Step 1 — Gather user information
 
 Use `AskUserQuestion` to collect the following in two calls:
@@ -37,7 +57,7 @@ If not, use `mcp__cowork__request_cowork_directory` to prompt them to select one
 The install creates:
 ```
 {target}/
-├── CLAUDE.md
+├── {config_file}             # CLAUDE.md for Claude, AGENTS.md for Codex
 ├── [framework folders]/      # created based on chosen framework (PARA, ACE, or Corder)
 └── AIMOS/
     ├── agent.md
@@ -52,20 +72,23 @@ The install creates:
         └── writing-style/SKILL.md
 ```
 
+`{config_file}` is determined by `{ai_platform}` from Step 0:
+
+| Platform        | Config file |
+| --------------- | ----------- |
+| Claude          | `CLAUDE.md` |
+| Codex / ChatGPT | `AGENTS.md` |
+| Opencode        | `AGENTS.md` |
+
 ---
 
-## Step 3 — Write CLAUDE.md
+## Step 3 — Write `{config_file}`
 
-Write to `{target}/CLAUDE.md`. Do not overwrite if it already exists — warn the user instead and tell them to add `@AIMOS/agent.md` manually.
+Write to `{target}/{config_file}`. Do not overwrite if it already exists — warn the user and tell them to add the briefing reference manually.
 
-```
-@AIMOS/agent.md
-
-# userEmail
-The user's email address is {email}.
-```
-
-Omit the `# userEmail` block entirely if no email was provided.
+**Content depends on platform:**
+- **Claude:** Write `@AIMOS/agent.md` as the first line, followed by `# userEmail` / email block if provided. Claude resolves the reference at runtime — `AIMOS/agent.md` (Step 4) is the live source.
+- **Codex:** Write the full briefing content inline using the same template and substitution rules from Step 4. Add `<!-- Source of truth: AIMOS/agent.md — sync changes here when that file is updated -->` as the first line. Still complete Step 4 to write the canonical `AIMOS/agent.md`.
 
 ---
 
