@@ -1,30 +1,32 @@
 ---
-name: cowork-install
-description: Install AIMOS into a user-selected folder using Claude Cowork — no terminal or npm needed.
+name: agentic-install
+description: Install AIMOS into a user-selected folder — no terminal or npm needed.
 tags:
   - AI
   - skill
 ---
 
-Install AIMOS into a user-selected folder using Claude Cowork's native tools. No terminal, Node.js, or npm required. Follow these steps exactly and in order.
+Install AIMOS into a user-selected folder using native tools. No terminal, Node.js, or npm required. Follow these steps exactly and in order.
+
+> **Re-install behavior:** Step 3 guards `{config_file}` against overwrite. Steps 4-8 will overwrite existing `AIMOS/*` files without prompting. If the user is reinstalling, warn them before proceeding.
 
 ---
 
 ## Step 0 — Detect AI platform
 
-Identify yourself, then set `{ai_platform}` and `{config_file}` from the table below. Do not ask the user unless you cannot determine your own identity.
+Identify yourself and set `{config_file}` from the table below. Do not ask the user unless you cannot determine your own identity.
 
-| AI | `{ai_platform}` | `{config_file}` |
-|---|---|---|
-| Claude | Claude | `CLAUDE.md` |
-| Codex | Codex | `AGENTS.md` |
-| OpenCode | OpenCode | `AGENTS.md` |
+| AI | `{config_file}` |
+|---|---|
+| Claude | `CLAUDE.md` |
+| Codex | `AGENTS.md` |
+| OpenCode | `AGENTS.md` |
 
 If you cannot identify yourself with confidence, use `AskUserQuestion`:
 
 > "Which AI assistant are you installing AIMOS for?"
 
-Options: **Claude**, **Codex / ChatGPT**, **OpenCode**, **Other**
+Options: **Claude**, **Codex**, **OpenCode**, **Other**
 
 For **Other**, ask what filename they want and use that as `{config_file}`. Treat content behavior the same as Codex (inline).
 
@@ -32,7 +34,7 @@ For **Other**, ask what filename they want and use that as `{config_file}`. Trea
 
 ## Step 1 — Gather user information
 
-Use `AskUserQuestion` to collect the following in two calls:
+Use `AskUserQuestion` to collect the following. `AskUserQuestion` caps at 4 questions per call, so split into two calls. If your platform doesn't support `AskUserQuestion`, ask these questions conversationally instead.
 
 **Call 1 — About you (4 questions):**
 - First name (required — text input)
@@ -50,14 +52,16 @@ Use `AskUserQuestion` to collect the following in two calls:
 
 ## Step 2 — Confirm install folder
 
-If the user has a workspace folder already selected in Cowork, install there.
+Ask the user which folder they want to install AIMOS into.
 
-If not, use `mcp__cowork__request_cowork_directory` to prompt them to select one.
+- **Most platforms:** Ask the user to provide the target folder path directly (e.g., `"Where would you like AIMOS installed?"`), then use that path as `{target}`.
+- **Claude Cowork:** If a workspace folder is already selected, use it. Otherwise, use `mcp__cowork__request_cowork_directory` to prompt the user to select one.
 
 The install creates:
 ```
 {target}/
 ├── {config_file}             # CLAUDE.md for Claude, AGENTS.md for Codex
+├── +/                        # default drop folder for new files
 ├── [framework folders]/      # created based on chosen framework (PARA, ACE, or Corder)
 └── AIMOS/
     ├── agent.md
@@ -65,30 +69,38 @@ The install creates:
     ├── memory.md
     ├── operations.md
     └── skills/
-        ├── cowork-install/SKILL.md
+        ├── agentic-install/SKILL.md
         ├── feedback/SKILL.md
         ├── meeting-notes/SKILL.md
         ├── skill-creator/SKILL.md
         └── writing-style/SKILL.md
 ```
 
-`{config_file}` is determined by `{ai_platform}` from Step 0:
-
-| Platform        | Config file |
-| --------------- | ----------- |
-| Claude          | `CLAUDE.md` |
-| Codex / ChatGPT | `AGENTS.md` |
-| Opencode        | `AGENTS.md` |
-
 ---
 
 ## Step 3 — Write `{config_file}`
 
-Write to `{target}/{config_file}`. Do not overwrite if it already exists — warn the user and tell them to add the briefing reference manually.
+Write to `{target}/{config_file}`. **Do not overwrite if it already exists** — warn the user and tell them to add the briefing reference manually.
 
 **Content depends on platform:**
-- **Claude:** Write `@AIMOS/agent.md` as the first line, followed by `# userEmail` / email block if provided. Claude resolves the reference at runtime — `AIMOS/agent.md` (Step 4) is the live source.
-- **Codex:** Write the full briefing content inline using the same template and substitution rules from Step 4. Add `<!-- Source of truth: AIMOS/agent.md — sync changes here when that file is updated -->` as the first line. Still complete Step 4 to write the canonical `AIMOS/agent.md`.
+
+- **Claude:** Use this exact template. Omit the `# userEmail` block entirely if no email was provided.
+  ```
+  @AIMOS/agent.md
+  # userEmail
+  The user's email address is {email}.
+  ```
+  Claude resolves the reference at runtime — `AIMOS/agent.md` (Step 4) is the live source.
+
+- **Codex / Other:** Write `{target}/AGENTS.md` as the Step 3 template with the `@AIMOS/agent.md` reference expanded inline — that is, replace the `@` reference with the full Step 4 content, all substitutions applied. Prefix the file with a sync comment, and append the `# userEmail` block if an email was provided:
+  ```
+  <!-- Source of truth: AIMOS/agent.md — sync changes here when that file is updated -->
+  [full Step 4 content with substitutions]
+
+  # userEmail
+  The user's email address is {email}.
+  ```
+  Still complete Step 4 to write the canonical `AIMOS/agent.md`.
 
 ---
 
@@ -156,20 +168,38 @@ When I ask you to do something, check the index first to see if there's a skill 
 | `{name}`                 | User's first name                                                                                                                                                                                                                                                                                              |
 | `{response_length_rule}` | Short → `Keep responses short unless I ask for more, or the task truly requires it` / Detailed → `Default to thorough, detailed responses unless I ask you to be brief`                                                                                                                                        |
 | `{pushback_rule}`        | Push back → `Give honest pushback when you disagree — push back when something seems off` / Follow lead → `Follow my direction; flag concerns briefly, then proceed`                                                                                                                                           |
-| `{tone_lines}`           | Casual → `- Clear, concise, and direct` + newline + `- Confident without being stiff` + newline + `- Conversational but purposeful` / Formal → `- Clear, concise, and respectful` + newline + `- Calm, confident, and accountability-driven` + newline + `- Direct without sounding abrupt or confrontational` |
+| `{tone_lines}`           | See **Tone line variants** below                                                                                                                                                                                                                                                                               |
 | `{sign_off}`             | User's chosen sign-off, default `Best,`                                                                                                                                                                                                                                                                        |
+
+**Tone line variants** — paste the matching block verbatim into the template:
+
+*Casual:*
+```
+- Clear, concise, and direct
+- Confident without being stiff
+- Conversational but purposeful
+```
+
+*Formal:*
+```
+- Clear, concise, and respectful
+- Calm, confident, and accountability-driven
+- Direct without sounding abrupt or confrontational
+```
 
 ---
 
 ## Step 5 — Define folder structure in AIMOS/index.md
 
-This step determines the `## Structure` section of `{target}/AIMOS/index.md`. It is the most important part of the install because Claude uses this map to navigate the project directory and know where to read from and write to.
+This step determines the `## Structure` section of `{target}/AIMOS/index.md`. It is the most important part of the install because your AI uses this map to navigate the project directory and know where to read from and write to.
+
+Every `index.md` ends with the **Skills Table** defined in [Appendix A](#appendix-a--skills-table). Insert that block verbatim wherever the template below references `{SKILLS_TABLE}`.
 
 ### 5a — Ask the user which option they want
 
 Use `AskUserQuestion` with a single question:
 
-> "How should Claude understand your folder structure?"
+> "How should your AI understand your folder structure?"
 
 Options:
 - **Use a framework template** — Choose from PARA, ACE, or the Corder system
@@ -177,6 +207,8 @@ Options:
 - **Skip for now** — Leave the structure blank; I'll fill it in later
 
 ---
+
+> **Execute exactly one of 5b, 5c, or 5d** based on the user's answer in 5a. Do not proceed to the others.
 
 ### 5b — Option 1: Framework template
 
@@ -186,11 +218,13 @@ If the user selects **Use a framework template**, ask a follow-up question:
 
 Options: `PARA`, `ACE`, `Corder System`
 
-Then write `{target}/AIMOS/index.md` using the matching template below.
+Execute the matching block below. Each block contains both the `index.md` template and the `mkdir` command — run them together.
 
 ---
 
-#### PARA
+#### 5b-i — PARA
+
+Write `{target}/AIMOS/index.md`:
 
 ```markdown
 # Vault Map
@@ -198,6 +232,7 @@ Then write `{target}/AIMOS/index.md` using the matching template below.
 ## Structure
 
 Root/
+├── +/                        # default drop folder for new files
 ├── 1 Projects/               # active, time-bound work with a clear outcome
 ├── 2 Areas/                  # ongoing responsibilities (no end date)
 ├── 3 Resources/              # reference material, templates, topic notes
@@ -208,12 +243,27 @@ Root/
 - **Projects** have a deadline or completion state. One folder per project.
 - **Areas** represent standards to maintain (e.g., Health, Finance, Career).
 - **Resources** are evergreen — reference material you return to over time.
-- **Archive** is a cold-storage dump. Claude ignores it unless explicitly asked.
+- **Archive** is a cold-storage dump. Ignore it by default unless explicitly asked.
+
+{SKILLS_TABLE}
+```
+
+Then create the folders:
+
+```bash
+mkdir -p \
+  "{target}/+" \
+  "{target}/1 Projects" \
+  "{target}/2 Areas" \
+  "{target}/3 Resources" \
+  "{target}/4 Archive"
 ```
 
 ---
 
-#### ACE
+#### 5b-ii — ACE
+
+Write `{target}/AIMOS/index.md`:
 
 ```markdown
 # Vault Map
@@ -221,6 +271,7 @@ Root/
 ## Structure
 
 Root/
+├── +/                        # default drop folder for new files
 ├── Atlas/                    # knowledge — notes, references, maps of content
 │   ├── Notes/
 │   ├── Concepts/
@@ -238,11 +289,30 @@ Root/
 - **Atlas** is timeless knowledge. Things you learn and want to keep.
 - **Calendar** is time-indexed. Anything with a date goes here.
 - **Efforts** is where work lives. Active projects and standing responsibilities.
+
+{SKILLS_TABLE}
+```
+
+Then create the folders:
+
+```bash
+mkdir -p \
+  "{target}/+" \
+  "{target}/Atlas/Notes" \
+  "{target}/Atlas/Concepts" \
+  "{target}/Atlas/People" \
+  "{target}/Calendar/Daily Notes" \
+  "{target}/Calendar/Weekly Reviews" \
+  "{target}/Calendar/Meetings" \
+  "{target}/Efforts/Projects" \
+  "{target}/Efforts/Areas"
 ```
 
 ---
 
-#### Corder System
+#### 5b-iii — Corder System
+
+Write `{target}/AIMOS/index.md`:
 
 ```markdown
 # Vault Map
@@ -254,57 +324,26 @@ Root/
 ├── 01-Projects/
 │   └── ACTIVE/
 │       └── [CLIENT]-[PROJECT]-[YYYY]/   # one folder per engagement; contains Project Hub note
-├── 02-Stakeholders/          # one note per key stakeholder; Claude reads these to calibrate comms
+├── 02-Stakeholders/          # one note per key stakeholder; read these to calibrate comms
 ├── 03-Action-Items/          # all action items as individual notes, queryable across projects
 ├── 04-Meetings/              # all meeting notes; project-code YAML field links to parent project
 ├── 05-Status-Reports/        # weekly status reports and sprint artifacts
 ├── 06-Templates/             # ready-to-use note templates
 ├── 07-Reference/
-│   ├── Claude-Context/       # context files loaded into every Claude session
-│   ├── SessionStarter.md     # copy-paste prompts to start Claude sessions
-│   ├── Obsidian-Daily-Workflow-Guide.md
-│   └── Obsidian-PM-Setup-Guide.md
+│   └── AI-Context/           # context files loaded into every session
 ├── 08-Daily-Notes/           # daily notes, auto-created each morning
 └── AIMOS/                    # AI OS config — do not modify unless asked
 
 ## Notes
 - New files default to `00-Inbox/` unless a specific folder is given.
 - Project folders follow the pattern `[CLIENT]-[PROJECT]-[YYYY]` for consistent sorting.
-- `02-Stakeholders/` is read by Claude when drafting communications to calibrate tone and context.
-- `07-Reference/Claude-Context/` is where additional Claude context files live beyond AIMOS.
+- `02-Stakeholders/` is read when drafting communications to calibrate tone and context.
+- `07-Reference/AI-Context/` is where additional AI context files live beyond AIMOS.
+
+{SKILLS_TABLE}
 ```
 
----
-
-### 5f — Create framework directories (Option 1 only)
-
-After writing `AIMOS/index.md`, use `Bash` to create the actual folders for the selected framework. Run the appropriate `mkdir -p` command below, substituting `{target}` with the install path.
-
-#### PARA
-
-```bash
-mkdir -p \
-  "{target}/1 Projects" \
-  "{target}/2 Areas" \
-  "{target}/3 Resources" \
-  "{target}/4 Archive"
-```
-
-#### ACE
-
-```bash
-mkdir -p \
-  "{target}/Atlas/Notes" \
-  "{target}/Atlas/Concepts" \
-  "{target}/Atlas/People" \
-  "{target}/Calendar/Daily Notes" \
-  "{target}/Calendar/Weekly Reviews" \
-  "{target}/Calendar/Meetings" \
-  "{target}/Efforts/Projects" \
-  "{target}/Efforts/Areas"
-```
-
-#### Corder System
+Then create the folders:
 
 ```bash
 mkdir -p \
@@ -315,11 +354,9 @@ mkdir -p \
   "{target}/04-Meetings" \
   "{target}/05-Status-Reports" \
   "{target}/06-Templates" \
-  "{target}/07-Reference/Claude-Context" \
+  "{target}/07-Reference/AI-Context" \
   "{target}/08-Daily-Notes"
 ```
-
-Run only the block that matches the user's chosen framework. Do not create directories for other frameworks.
 
 ---
 
@@ -327,12 +364,19 @@ Run only the block that matches the user's chosen framework. Do not create direc
 
 If the user selects **Read my existing folders**:
 
-1. Use `Bash` to list the top two levels of the selected workspace directory, excluding hidden folders and the `AIMOS/` folder itself:
+1. Use `Bash` to list directories two levels deep in the workspace, excluding hidden folders, AIMOS itself, and git internals:
    ```bash
-   find {target} -maxdepth 2 -not -path '*/.git*' -not -path '*/AIMOS*' -not -name '.*' | sort
+   find "{target}" -maxdepth 2 -type d \
+     -not -path '*/.git' -not -path '*/.git/*' \
+     -not -path '*/AIMOS' -not -path '*/AIMOS/*' \
+     -not -name '.*' | sort
    ```
 2. Parse the output into a tree representation.
-3. Write `{target}/AIMOS/index.md` using this structure:
+3. Create the `+/` drop folder if it doesn't already exist:
+   ```bash
+   mkdir -p "{target}/+"
+   ```
+4. Write `{target}/AIMOS/index.md` using this structure:
 
 ```markdown
 # Vault Map
@@ -343,58 +387,36 @@ If the user selects **Read my existing folders**:
 
 ## Notes
 - This structure was scanned from your existing directory on install.
-- Update this file any time your folder structure changes so Claude stays accurate.
+- Update this file any time your folder structure changes so your AI stays accurate.
+
+{SKILLS_TABLE}
 ```
 
-4. After writing, tell the user: "I mapped your existing folder structure into `AIMOS/index.md`. Review it and add any notes or corrections — Claude will use this to navigate your files."
+5. After writing, tell the user: "I mapped your existing folder structure into `AIMOS/index.md`. Review it and add any notes or corrections — your AI will use this to navigate your files."
 
 ---
 
 ### 5d — Option 3: Skip
 
-If the user selects **Skip for now**, write a minimal placeholder to `{target}/AIMOS/index.md`:
+If the user selects **Skip for now**, create the `+/` drop folder and write a minimal placeholder.
+
+```bash
+mkdir -p "{target}/+"
+```
+
+Write `{target}/AIMOS/index.md`:
 
 ```markdown
 # Vault Map
 
 ## Structure
 
-<!-- Add your folder structure here. Claude uses this to navigate your files. -->
+<!-- Add your folder structure here. Your AI uses this to navigate your files. -->
 
-## Skills
-
-Located in `AIMOS/skills/` — each is a subfolder with a `SKILL.md`:
-
-| Skill | Description |
-|---|---|
-| `cowork-install` | Install AIMOS into a folder via Claude Cowork |
-| `feedback` | Draft structured feedback using the SBI framework |
-| `meeting-notes` | Meeting note structure and formatting |
-| `skill-creator` | Create new skills in the correct format |
-| `writing-style` | Tone, structure, and voice guidance |
+{SKILLS_TABLE}
 ```
 
 Tell the user: "The index structure section is blank. When you're ready, open `AIMOS/index.md` and describe your folder layout — or ask me to scan your directory and build it automatically."
-
----
-
-### 5e — Append Skills table (all options)
-
-After writing the Structure section (regardless of which option was chosen), append the following Skills table to `{target}/AIMOS/index.md` — unless it was already included in the template (Option 3 includes it by default):
-
-```markdown
-## Skills
-
-Located in `AIMOS/skills/` — each is a subfolder with a `SKILL.md`:
-
-| Skill | Description |
-|---|---|
-| `cowork-install` | Install AIMOS into a folder via Claude Cowork |
-| `feedback` | Draft structured feedback using the SBI framework |
-| `meeting-notes` | Meeting note structure and formatting |
-| `skill-creator` | Create new skills in the correct format |
-| `writing-style` | Tone, structure, and voice guidance |
-```
 
 ---
 
@@ -406,7 +428,7 @@ Write the following to `{target}/AIMOS/operations.md`, substituting user answers
 # Operations
 
 Update this file with your current projects and active work context.
-Claude references this file whenever you discuss project work.
+Your AI references this file whenever you discuss project work.
 
 ## Active Context
 
@@ -447,7 +469,7 @@ Write the following to `{target}/AIMOS/memory.md` (static — no substitution ne
 
 ## Step 8 — Copy skill files
 
-Fetch each file from the URLs below and write to the corresponding path under `{target}/AIMOS/skills/`. These are static files — write them exactly as fetched without modification.
+Fetch each file from the URLs below and write to the corresponding path under `{target}/AIMOS/skills/`. These are static files — write them exactly as fetched without modification. Fetch all five in parallel if your tools support concurrent calls.
 
 | Target path | Source URL |
 |---|---|
@@ -455,11 +477,23 @@ Fetch each file from the URLs below and write to the corresponding path under `{
 | `AIMOS/skills/meeting-notes/SKILL.md` | https://raw.githubusercontent.com/smblasik/AIMOS/main/meeting-notes.md |
 | `AIMOS/skills/skill-creator/SKILL.md` | https://raw.githubusercontent.com/smblasik/AIMOS/main/skill-creator.md |
 | `AIMOS/skills/writing-style/SKILL.md` | https://raw.githubusercontent.com/smblasik/AIMOS/main/writing-style.md |
-| `AIMOS/skills/cowork-install/SKILL.md` | https://raw.githubusercontent.com/smblasik/AIMOS/main/install.md |
+| `AIMOS/skills/agentic-install/SKILL.md` | https://raw.githubusercontent.com/smblasik/AIMOS/main/install.md |
+
+> Note: the `agentic-install` skill installs a copy of this very file. That's intentional — it lets the installed AIMOS instance re-run or update its own install procedure. **Maintainer:** the source is `install.md` in the repo; the destination is `agentic-install/SKILL.md`. If you rename either, update the other.
+
+After fetching, verify all files exist before proceeding:
+
+```bash
+ls -1 "{target}/AIMOS" && ls -1 "{target}/AIMOS/skills"
+```
+
+If any file is missing, retry that fetch before moving to Step 9.
 
 ---
 
 ## Step 9 — Confirm completion and optionally enrich operations
+
+> **9b runs in both cases.** Whether the user enriches operations in 9a or not, always finish with 9b.
 
 ### 9a — Optional: SOW or client summary
 
@@ -495,7 +529,7 @@ Then **overwrite** `{target}/AIMOS/operations.md` with the enriched version:
 ```markdown
 # Operations
 
-Claude references this file whenever you discuss project work. Update it as context evolves.
+Your AI references this file whenever you discuss project work. Update it as context evolves.
 
 ## Identity and Strategic Context
 
@@ -554,4 +588,26 @@ Tell the user:
 - Where AIMOS was installed (folder path)
 - What was created (brief file list)
 
-Do not link to internal file paths or expose system directories. Use plain folder names only.
+Use the folder name the user selected, not full system paths (e.g., `Notes/Work` not `/Users/name/Library/CloudStorage/...`).
+
+---
+
+## Appendix A — Skills Table
+
+The `{SKILLS_TABLE}` placeholder in any `index.md` template expands to this block verbatim:
+
+```markdown
+## Skills
+
+Located in `AIMOS/skills/` — each is a subfolder with a `SKILL.md`:
+
+| Skill | Description |
+|---|---|
+| `agentic-install` | Install AIMOS into any folder |
+| `feedback` | Draft structured feedback using the SBI framework |
+| `meeting-notes` | Meeting note structure and formatting |
+| `skill-creator` | Create new skills in the correct format |
+| `writing-style` | Tone, structure, and voice guidance |
+```
+
+When this skill table changes, update this appendix only — all index.md templates pull from here.
