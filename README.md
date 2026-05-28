@@ -1,3 +1,6 @@
+---
+connections: "[[AIMOS]]"
+---
 # AIMOS — AI Operating System
 
 A personalized Agentic AI setup you can drop into any folder or Obsidian vault. Answer a few questions and it configures itself around your name, working style, and folder structure. Works with Claude, Codex, OpenCode, or any AI that reads a config file on startup.

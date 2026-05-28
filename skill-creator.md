@@ -4,6 +4,8 @@ description: Helps create new skills in the correct format with proper YAML fron
 tags:
   - AI
   - skill
+connections:
+  - "[[AIMOS]]"
 ---
 
 Guide the creation of a new skill.

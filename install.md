@@ -4,6 +4,8 @@ description: Install AIMOS into a user-selected folder — no terminal or npm ne
 tags:
   - AI
   - skill
+connections:
+  - "[[AIMOS]]"
 ---
 
 Install AIMOS into a user-selected folder using native tools. No terminal, Node.js, or npm required. Follow these steps exactly and in order.

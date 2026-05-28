@@ -4,6 +4,7 @@ description: Outlines how meeting notes should be structured.
 tags:
   - AI
   - skill
+connections: "[[AIMOS]]"
 ---
 
 1. Process the input given

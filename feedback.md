@@ -4,6 +4,8 @@ description: Draft structured written feedback (email, Workday, PM tools) using 
 tags:
   - AI
   - skill
+connections:
+  - "[[AIMOS]]"
 ---
 
 Draft clear, objective, and actionable **written** feedback using the SBI framework. Use this skill when asked to write feedback for a colleague or direct report — whether in an email to their manager or as an entry in a performance management system (Workday, etc.).

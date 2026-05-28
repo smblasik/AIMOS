@@ -4,6 +4,8 @@ description: clear purpose, respectful tone, first-person ownership, operational
 tags:
   - AI
   - skill
+connections:
+  - "[[AIMOS]]"
 ---
 
 Tone:
