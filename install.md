@@ -10,7 +10,7 @@ connections:
 
 Install AIMOS into a user-selected folder using native tools. No terminal, Node.js, or npm required. Follow these steps exactly and in order.
 
-> **Re-install behavior:** Step 3 guards `{config_file}` against overwrite. Steps 4-8 will overwrite existing `AIMOS/*` files without prompting. If the user is reinstalling, warn them before proceeding.
+> **Re-install behavior:** Step 4 guards `{config_file}` against overwrite. Steps 5-9 will overwrite existing `AIMOS/*` files without prompting. If the user is reinstalling, warn them before proceeding.
 
 ---
 
@@ -34,7 +34,25 @@ For **Other**, ask what filename they want and use that as `{config_file}`. Trea
 
 ---
 
-## Step 1 — Gather user information
+## Step 1 — Choose install mode
+
+Use `AskUserQuestion` with a single question:
+
+> "How will AIMOS be used?"
+
+Options:
+- **Personal** — Just me; my name and preferences are saved into the config files
+- **Project / Shared** — A shared repository or team workspace; all files stay generic with no personal data
+
+Set `{mode}` = `personal` or `project`.
+
+> **Mode affects:** Step 2 (skipped entirely for project), Step 4 (config file content), Step 5 (agent.md template), and Step 7 (operations.md template).
+
+---
+
+## Step 2 — Gather user information *(personal mode only)*
+
+> **Skip this step entirely if `{mode}` = `project`.** Proceed directly to Step 3.
 
 Use `AskUserQuestion` to collect the following. `AskUserQuestion` caps at 4 questions per call, so split into two calls. If your platform doesn't support `AskUserQuestion`, ask these questions conversationally instead.
 
@@ -52,7 +70,7 @@ Use `AskUserQuestion` to collect the following. `AskUserQuestion` caps at 4 ques
 
 ---
 
-## Step 2 — Confirm install folder
+## Step 3 — Confirm install folder
 
 Ask the user which folder they want to install AIMOS into.
 
@@ -80,33 +98,48 @@ The install creates:
 
 ---
 
-## Step 3 — Write `{config_file}`
+## Step 4 — Write `{config_file}`
 
 Write to `{target}/{config_file}`. **Do not overwrite if it already exists** — warn the user and tell them to add the briefing reference manually.
 
-**Content depends on platform:**
+**Content depends on platform and mode:**
 
-- **Claude:** Use this exact template. Omit the `# userEmail` block entirely if no email was provided.
+- **Claude, personal mode:** Use this exact template. Omit the `# userEmail` block entirely if no email was provided.
   ```
   @AIMOS/agent.md
   # userEmail
   The user's email address is {email}.
   ```
-  Claude resolves the reference at runtime — `AIMOS/agent.md` (Step 4) is the live source.
 
-- **Codex / Other:** Write `{target}/AGENTS.md` as the Step 3 template with the `@AIMOS/agent.md` reference expanded inline — that is, replace the `@` reference with the full Step 4 content, all substitutions applied. Prefix the file with a sync comment, and append the `# userEmail` block if an email was provided:
+- **Claude, project mode:** Write only the reference — no personal data.
+  ```
+  @AIMOS/agent.md
+  ```
+
+- **Codex / Other, personal mode:** Write `{target}/AGENTS.md` with the `@AIMOS/agent.md` reference expanded inline — replace the `@` reference with the full Step 5 personal content, all substitutions applied. Prefix the file with a sync comment and append the `# userEmail` block if an email was provided:
   ```
   <!-- Source of truth: AIMOS/agent.md — sync changes here when that file is updated -->
-  [full Step 4 content with substitutions]
+  [full Step 5 personal content with substitutions]
 
   # userEmail
   The user's email address is {email}.
   ```
-  Still complete Step 4 to write the canonical `AIMOS/agent.md`.
+
+- **Codex / Other, project mode:** Same inline expansion but use the Step 5 project template. No `# userEmail` block.
+  ```
+  <!-- Source of truth: AIMOS/agent.md — sync changes here when that file is updated -->
+  [full Step 5 project content]
+  ```
+
+Still complete Step 5 in all cases to write the canonical `AIMOS/agent.md`.
 
 ---
 
-## Step 4 — Write AIMOS/agent.md
+## Step 5 — Write AIMOS/agent.md
+
+Content depends on `{mode}`.
+
+### Personal mode
 
 Write the following to `{target}/AIMOS/agent.md`, substituting all `{placeholders}` with the user's answers per the rules below the template.
 
@@ -191,13 +224,66 @@ When I ask you to do something, check the index first to see if there's a skill 
 
 ---
 
-## Step 5 — Define folder structure in AIMOS/index.md
+### Project mode
+
+Write the following to `{target}/AIMOS/agent.md` verbatim — no substitutions needed.
+
+```markdown
+This is the AIMOS project briefing. Read it every session.
+
+- [agent](AIMOS/agent.md) — This briefing. Read every time.
+- [memory](AIMOS/memory.md) — Session memory. Write things to remember here.
+- [index](AIMOS/index.md) — Project navigation guide.
+- [operations](AIMOS/operations.md) — Current project context and active work.
+- [skills](AIMOS/skills/) — All defined skills available in this project.
+
+# Project Working Conventions
+
+## Rules
+- Plain markdown only — use `[label](relative/path.md)`, no `[[wikilinks]]`
+- Time-stamped files must use the format `YYYY-MM-DD Description.ext`
+- New files go in `+/` unless a specific location is given
+- Always ask before making changes to existing files
+- Always draft emails and show them before sending — never send without approval
+- Ask before any external/public-facing action (emails, publishing, posting)
+- Be bold with internal actions (reading, organizing, learning)
+- When starting fresh, state what context you have and confirm you have no prior conversation history
+
+## Defaults
+- Keep responses short unless the task requires more
+- Be resourceful before asking. Read the file, check the context, search for it — then ask if stuck
+- Don't end messages with a question unless it's crucial to completing the task. Just land the thought
+- Skip "Great question!" and "I'd be happy to help!" — just help
+
+## Writing Style
+
+### Tone
+- Clear, concise, and direct
+- Professional and purposeful
+
+### Structure
+- Open with brief context for why you're writing
+- State clearly what is being asked or clarified
+- Avoid filler and emotional language
+
+### Voice
+- Solution-oriented and direct
+- Written as a team coordinating work across contributors
+
+## Skills
+Read the [index](AIMOS/index.md) before processing any involved request.
+Check the index first to see if there's a skill for it.
+```
+
+---
+
+## Step 6 — Define folder structure in AIMOS/index.md
 
 This step determines the `## Structure` section of `{target}/AIMOS/index.md`. It is the most important part of the install because your AI uses this map to navigate the project directory and know where to read from and write to.
 
 Every `index.md` ends with the **Skills Table** defined in [Appendix A](#appendix-a--skills-table). Insert that block verbatim wherever the template below references `{SKILLS_TABLE}`.
 
-### 5a — Ask the user which option they want
+### 6a — Ask the user which option they want
 
 Use `AskUserQuestion` with a single question:
 
@@ -210,9 +296,9 @@ Options:
 
 ---
 
-> **Execute exactly one of 5b, 5c, or 5d** based on the user's answer in 5a. Do not proceed to the others.
+> **Execute exactly one of 6b, 6c, or 6d** based on the user's answer in 6a. Do not proceed to the others.
 
-### 5b — Option 1: Framework template
+### 6b — Option 1: Framework template
 
 If the user selects **Use a framework template**, ask a follow-up question:
 
@@ -224,7 +310,7 @@ Execute the matching block below. Each block contains both the `index.md` templa
 
 ---
 
-#### 5b-i — PARA
+#### 6b-i — PARA
 
 Write `{target}/AIMOS/index.md`:
 
@@ -263,7 +349,7 @@ mkdir -p \
 
 ---
 
-#### 5b-ii — ACE
+#### 6b-ii — ACE
 
 Write `{target}/AIMOS/index.md`:
 
@@ -312,7 +398,7 @@ mkdir -p \
 
 ---
 
-#### 5b-iii — Corder System
+#### 6b-iii — Corder System
 
 Write `{target}/AIMOS/index.md`:
 
@@ -362,7 +448,7 @@ mkdir -p \
 
 ---
 
-### 5c — Option 2: Read existing folder structure
+### 6c — Option 2: Read existing folder structure
 
 If the user selects **Read my existing folders**:
 
@@ -398,7 +484,7 @@ If the user selects **Read my existing folders**:
 
 ---
 
-### 5d — Option 3: Skip
+### 6d — Option 3: Skip
 
 If the user selects **Skip for now**, create the `+/` drop folder and write a minimal placeholder.
 
@@ -422,7 +508,11 @@ Tell the user: "The index structure section is blank. When you're ready, open `A
 
 ---
 
-## Step 6 — Write AIMOS/operations.md
+## Step 7 — Write AIMOS/operations.md
+
+Content depends on `{mode}`.
+
+### Personal mode
 
 Write the following to `{target}/AIMOS/operations.md`, substituting user answers:
 
@@ -458,7 +548,47 @@ Leave `{role}` and `{org}` blank if not provided.
 
 ---
 
-## Step 7 — Write AIMOS/memory.md
+### Project mode
+
+Write the following to `{target}/AIMOS/operations.md` verbatim — no personal fields:
+
+```markdown
+# Operations
+
+Update this file with the current project context.
+Your AI references this file whenever project work is discussed.
+
+## Project Context
+
+- **Project:**
+- **Client / Organization:**
+- **Engagement Type:**
+- **Environment:**
+- **Goal:**
+
+## Current Work
+
+| Item | Status | Notes |
+|------|--------|-------|
+| | | |
+
+## Key Stakeholders
+
+| Name | Role | Notes |
+|------|------|-------|
+| | | |
+
+## Behavioral Defaults
+
+- **Lead with Output:** Deliver the artifact first. Provide commentary afterward.
+- **Format:** Structured Markdown. Use headers, short paragraphs, and tables.
+- **Tone:** Adapt to context — formal for stakeholders, direct for working sessions.
+- **Ambiguity:** State assumptions and proceed. Only halt for material gaps.
+```
+
+---
+
+## Step 8 — Write AIMOS/memory.md
 
 Write the following to `{target}/AIMOS/memory.md` (static — no substitution needed):
 
@@ -469,7 +599,7 @@ Write the following to `{target}/AIMOS/memory.md` (static — no substitution ne
 
 ---
 
-## Step 8 — Copy skill files
+## Step 9 — Copy skill files
 
 Fetch each file from the URLs below and write to the corresponding path under `{target}/AIMOS/skills/`. These are static files — write them exactly as fetched without modification. Fetch all five in parallel if your tools support concurrent calls.
 
@@ -489,15 +619,15 @@ After fetching, verify all files exist before proceeding:
 ls -1 "{target}/AIMOS" && ls -1 "{target}/AIMOS/skills"
 ```
 
-If any file is missing, retry that fetch before moving to Step 9.
+If any file is missing, retry that fetch before moving to Step 10.
 
 ---
 
-## Step 9 — Confirm completion and optionally enrich operations
+## Step 10 — Confirm completion and optionally enrich operations
 
-> **9b runs in both cases.** Whether the user enriches operations in 9a or not, always finish with 9b.
+> **10b runs in both cases.** Whether the user enriches operations in 10a or not, always finish with 10b.
 
-### 9a — Optional: SOW or client summary
+### 10a — Optional: SOW or client summary
 
 Use `AskUserQuestion` with a single question:
 
@@ -526,7 +656,9 @@ Once received, extract the following fields (use best judgment where fields are 
 | Environment | Industry, regulatory context, or technical environment |
 | Goal | Primary objective or business outcome |
 
-Then **overwrite** `{target}/AIMOS/operations.md` with the enriched version:
+Then **overwrite** `{target}/AIMOS/operations.md` with the enriched version matching `{mode}`:
+
+**Personal mode:**
 
 ```markdown
 # Operations
@@ -568,11 +700,50 @@ Your AI references this file whenever you discuss project work. Update it as con
 - **Ambiguity:** State assumptions and proceed. Only halt for material gaps.
 ```
 
+**Project mode:**
+
+```markdown
+# Operations
+
+Your AI references this file whenever project work is discussed. Update it as context evolves.
+
+## Strategic Context
+
+- **Client:** {client}
+- **Project:** {project}
+- **Engagement Type:** {engagement_type}
+- **Environment:** {environment}
+- **Goal:** {goal}
+
+## Current Work
+
+| Item | Status | Notes |
+|------|--------|-------|
+| {project} | Active | {scope_summary} |
+
+## Key Stakeholders
+
+| Name | Role | Notes |
+|------|------|-------|
+{stakeholder_rows}
+
+## Timeline
+
+{timeline}
+
+## Behavioral Defaults
+
+- **Lead with Output:** Deliver the artifact first. Provide commentary afterward.
+- **Format:** Structured Markdown. Use headers, short paragraphs, and tables.
+- **Tone:** Adapt to context — formal for stakeholders, direct for working sessions.
+- **Ambiguity:** State assumptions and proceed. Only halt for material gaps.
+```
+
 **Fill-in rules:**
 - `{stakeholder_rows}` — one `| Name | Role | Notes |` row per identified stakeholder; if none found, write `| — | — | — |`
 - `{timeline}` — bullet list of milestones or date ranges if found; otherwise write `—`
 - Any field that cannot be extracted: leave blank or write `—`
-- Carry over `{name}`, `{role}`, `{org}` from Step 1 answers
+- Personal mode only: carry over `{name}`, `{role}`, `{org}` from Step 2 answers
 
 Tell the user: "I've populated `operations.md` with context from your document. Review and update it as the engagement evolves."
 
@@ -580,11 +751,11 @@ Tell the user: "I've populated `operations.md` with context from your document. 
 
 #### If the user selects No
 
-Proceed to 9b.
+Proceed to 10b.
 
 ---
 
-### 9b — Confirm install
+### 10b — Confirm install
 
 Tell the user:
 - Where AIMOS was installed (folder path)
