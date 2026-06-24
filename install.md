@@ -22,6 +22,7 @@ Identify yourself and set `{config_file}` from the table below. Do not ask the u
 |---|---|
 | Claude | `CLAUDE.md` |
 | Codex | `AGENTS.md` |
+| GitHub Copilot | `AGENTS.md` |
 | OpenCode | `AGENTS.md` |
 
 If you cannot identify yourself with confidence, use `AskUserQuestion`:
